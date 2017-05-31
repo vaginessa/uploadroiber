@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     FilePicker filePicker;
     ProgressBar mProgress;
-    Toast t1;
 
     public void executeSSHcommand(String sourceFile) {
         try {
