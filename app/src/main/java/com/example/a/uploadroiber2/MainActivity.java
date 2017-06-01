@@ -1,13 +1,10 @@
 package com.example.a.uploadroiber2;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -53,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
             Calendar c = Calendar.getInstance();
             StringBuilder targetfilename = new StringBuilder();
             targetfilename.append(c.get(Calendar.YEAR));
-            targetfilename.append(String.format("%02d",c.get(Calendar.MONTH) + 1));
-            targetfilename.append(String.format("%02d",c.get(Calendar.DAY_OF_MONTH)));
-            targetfilename.append(String.format("%02d",c.get(Calendar.HOUR_OF_DAY)));
-            targetfilename.append(String.format("%02d",c.get(Calendar.MINUTE)));
-            targetfilename.append(String.format("%02d",c.get(Calendar.SECOND)));
+            targetfilename.append(String.format("%02d", c.get(Calendar.MONTH) + 1));
+            targetfilename.append(String.format("%02d", c.get(Calendar.DAY_OF_MONTH)));
+            targetfilename.append(String.format("%02d", c.get(Calendar.HOUR_OF_DAY)));
+            targetfilename.append(String.format("%02d", c.get(Calendar.MINUTE)));
+            targetfilename.append(String.format("%02d", c.get(Calendar.SECOND)));
 
             String randString = "0123456789abcdef";
             Random r = new Random();
@@ -77,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             session.disconnect();
 
         } catch (JSchException e) {
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(MainActivity.this,
@@ -86,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } catch (SftpException e) {
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(MainActivity.this,
@@ -103,27 +100,47 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
         filePicker = new FilePicker(this);
         filePicker.setFilePickerCallback(new FilePickerCallback() {
             @Override
             public void onFilesChosen(List<ChosenFile> files) {
                 if (files.size() != 1) {
-                    Toast.makeText(MainActivity.this,
-                            "Max 1 File", Toast.LENGTH_LONG).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,
+                                    "Max 1 File", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 } else {
                     final Uri myUri = Uri.parse(files.get(0).getQueryUri());
-                    new AsyncTask<Integer, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Integer... params) {
-                            try {
-                                executeSSHcommand(RealPathUtil.getRealPathFromURI(MainActivity.this, myUri));
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                    String RealPath = RealPathUtil.getRealPathFromURI(MainActivity.this, myUri);
+                    if (RealPath != null && RealPath != "") {
+                        new AsyncTask<Integer, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Integer... params) {
+                                try {
+                                    executeSSHcommand(RealPathUtil.getRealPathFromURI(MainActivity.this, myUri));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
                             }
-                            return null;
-                        }
-                    }.execute(1);
+                        }.execute(1);
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,
+                                        "Dont select images from external storage directly. " +
+                                                "Use \"Files\"",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+
                 }
             }
 
@@ -133,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final Button button = (Button) findViewById(R.id.button);
+        //remove ugly AllCAPS SHIT
+        button.setTransformationMethod(null);
+
         mProgress = (ProgressBar) findViewById(R.id.progressBar);
 
         button.setOnClickListener(new View.OnClickListener() {
