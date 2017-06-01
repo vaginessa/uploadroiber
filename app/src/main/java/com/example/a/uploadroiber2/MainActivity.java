@@ -1,10 +1,13 @@
 package com.example.a.uploadroiber2;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -50,11 +53,11 @@ public class MainActivity extends AppCompatActivity {
             Calendar c = Calendar.getInstance();
             StringBuilder targetfilename = new StringBuilder();
             targetfilename.append(c.get(Calendar.YEAR));
-            targetfilename.append(c.get(Calendar.MONTH) + 1);
-            targetfilename.append(c.get(Calendar.DAY_OF_MONTH));
-            targetfilename.append(c.get(Calendar.HOUR_OF_DAY));
-            targetfilename.append(c.get(Calendar.MINUTE));
-            targetfilename.append(c.get(Calendar.SECOND));
+            targetfilename.append(String.format("%02d",c.get(Calendar.MONTH) + 1));
+            targetfilename.append(String.format("%02d",c.get(Calendar.DAY_OF_MONTH)));
+            targetfilename.append(String.format("%02d",c.get(Calendar.HOUR_OF_DAY)));
+            targetfilename.append(String.format("%02d",c.get(Calendar.MINUTE)));
+            targetfilename.append(String.format("%02d",c.get(Calendar.SECOND)));
 
             String randString = "0123456789abcdef";
             Random r = new Random();
